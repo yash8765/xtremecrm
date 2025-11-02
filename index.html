@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Xtreme Industries CRM</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --card:#121a2f;
+    --muted:#8aa0c7;
+    --text:#e9eefc;
+    --accent:#4f8cff;
+    --accent-2:#12c29f;
+    --danger:#ff6b6b;
+    --warn:#ffb020;
+    --ok:#4cd66d;
+    --border:#233155;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+  a{color:var(--accent)}
+  button{cursor:pointer}
+  .app{display:grid;grid-template-columns:280px 1fr;height:100%}
+  .sidebar{
+    background:linear-gradient(180deg,#0c1328,#0b1020 50%,#0b1020);
+    border-right:1px solid var(--border);
+    padding:18px 12px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px dashed var(--border)
+  }
+  .logo img{width:40px;height:40px;object-fit:contain;border-radius:8px;background:#0a0f1f}
+  .brand{font-weight:700;letter-spacing:.2px}
+  .nav{display:flex;flex-direction:column;gap:6px}
+  .nav button{
+    background:transparent;border:1px solid transparent;color:var(--text);text-align:left;padding:10px 12px;border-radius:10px
+  }
+  .nav button.active{background:var(--card);border-color:var(--border)}
+  .nav .sep{margin:10px 0;border-bottom:1px dashed var(--border)}
+  .role-tag{color:var(--muted);font-size:12px;margin-left:auto}
+  .userbox{
+    margin-top:16px;padding:10px;border:1px solid var(--border);border-radius:12px;background:#0c1429
+  }
+  .main{
+    padding:18px;overflow:auto
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px
+  }
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .grow{flex:1}
+  .muted{color:var(--muted)}
+  .ok{color:var(--ok)}
+  .warn{color:var(--warn)}
+  .danger{color:var(--danger)}
+  .input, select, textarea{
+    width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+    background:#0c1429;color:var(--text);outline:none
+  }
+  textarea{min-height:90px}
+  .btn{
+    padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#0c1429;color:var(--text)
+  }
+  .btn.primary{background:var(--accent);border-color:#2f65d8;color:#fff}
+  .btn.good{background:var(--accent-2);border-color:#0ea789;color:#041316}
+  .btn.warn{background:var(--warn);border-color:#d99016;color:#161003}
+  .btn.danger{background:var(--danger);border-color:#e35656;color:#160707}
+  .btn.ghost{background:transparent}
+  .table{
+    width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:12px;overflow:hidden
+  }
+  .table th,.table td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+  .table th{background:#0c1429;color:#cbd6f2;font-weight:600}
+  .badge{padding:4px 8px;border-radius:16px;font-size:12px;background:#0c1429;border:1px solid var(--border)}
+  .status-open{background:#133a7c;color:#cfe3ff;border-color:#2f65d8}
+  .status-won{background:#0d3c2f;color:#b9f5e7;border-color:#0ea789}
+  .status-lost{background:#3c1010;color:#ffd3d3;border-color:#e35656}
+  .hidden{display:none !important}
+  .sticky-actions{position:sticky;bottom:0;background:linear-gradient(180deg,transparent 0,#121a2f 24px,#121a2f);padding-top:16px}
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi .item{background:#0c1429;border:1px solid var(--border);border-radius:12px;padding:12px}
+  .kpi .item .title{color:#a9b8dc;font-size:12px}
+  .kpi .item .value{font-size:20px;font-weight:700;margin-top:6px}
+  .tag{border:1px solid var(--border);background:#0c1429;color:#cbd6f2;border-radius:999px;padding:4px 10px;font-size:12px}
+  .hr{border-bottom:1px dashed var(--border);margin:10px 0}
+  .pill{padding:6px 10px;border-radius:999px;background:#0c1429;border:1px solid var(--border);font-size:12px;color:#cbd6f2}
+  .headerline{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .headerline h2{margin:0;font-size:20px}
+  .sub{color:#a9b8dc;font-size:13px}
+  .file{display:inline-flex;align-items:center;gap:8px}
+  .help{font-size:12px;color:#8aa0c7}
+  .print-area{background:#fff;color:#000;padding:18px}
+  .q-header{display:flex;justify-content:space-between;align-items:start}
+  .q-logo{height:48px}
+  .q-title{font-weight:800;font-size:18px}
+  .q-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .q-table{width:100%;border-collapse:collapse;margin-top:10px}
+  .q-table th,.q-table td{border:1px solid #333;padding:8px;text-align:left}
+  .t-right{text-align:right}
+  .no-wrap{white-space:nowrap}
+  .login{
+    max-width:460px;margin:12vh auto;background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);
+    padding:18px
+  }
+  .login h1{margin:0 0 8px}
+  .login .brandline{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .footer-note{color:#8aa0c7;font-size:12px;margin-top:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#0c1429;color:#cbd6f2}
+  .searchbar{display:flex;gap:8px}
+  .soft{color:#a9b8dc}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="login" class="login">
+  <div class="brandline">
+    <img id="loginLogo" src="" alt="Logo" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:#0a0f1f;border:1px solid var(--border)" />
+    <div>
+      <h1>Xtreme Industries CRM</h1>
+      <div class="soft">Sign in with Employee ID (E10001–E10010). Default password equals the ID.</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <label>Employee ID</label>
+      <input id="loginId" class="input" placeholder="E10001" />
+    </div>
+    <div>
+      <label>Password</label>
+      <input id="loginPw" type="password" class="input" placeholder="E10001" />
+    </div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn primary" onclick="handleLogin()">Sign in</button>
+    <span class="muted">Admins: E10001, E10002</span>
+  </div>
+  <div class="footer-note">Tip: Add your logo after login (Admins). It appears in CRM header and PDFs.</div>
+</section>
+
+<!-- APP -->
+<section id="app" class="app hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img id="crmLogo" src="" alt="Logo"/>
+      <div class="brand">
+        Xtreme Industries
+        <div id="roleLabel" class="role-tag"></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="active" data-view="dashboard" onclick="switchView('dashboard')">Dashboard</button>
+      <button data-view="leads" onclick="switchView('leads')">Leads</button>
+      <button data-view="products" onclick="switchView('products')" id="navProducts">Products</button>
+      <button data-view="reports" onclick="switchView('reports')" id="navReports">Reports</button>
+      <div class="sep"></div>
+      <button data-view="settings" onclick="switchView('settings')" id="navSettings">Settings</button>
+      <button class="ghost" onclick="logout()">Sign out</button>
+    </div>
+
+    <div class="userbox">
+      <div><strong>User:</strong> <span id="userIdBox">-</span></div>
+      <div class="muted">Name: <span id="userNameBox">Not set</span></div>
+      <div class="muted">Mobile: <span id="userMobileBox">Not set</span></div>
+      <div class="hr"></div>
+      <div id="connectionStatus" style="font-size:11px;margin-top:8px;">🟢 Online</div>
+      <div class="help">Employees can view product list. Admin-only controls are hidden for others.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="card">
+      <div class="headerline">
+        <h2>Dashboard</h2><span class="sub">Quick snapshot</span>
+        <div class="row">
+  <!-- Quick Dashboard (already exists) -->
+
+  <!-- Daily Dashboard -->
+  <div class="card" style="flex:1; margin:8px;">
+    <h3>Daily Dashboard</h3>
+    <canvas id="dailyChart" height="120"></canvas>
+  </div>
+
+  <!-- Weekly Dashboard -->
+  <div class="card" style="flex:1; margin:8px;">
+    <h3>Weekly Dashboard</h3>
+    <canvas id="weeklyChart" height="120"></canvas>
+  </div>
+</div>
+      </div>
+      <div class="kpi">
+        <div class="item"><div class="title">Open leads</div><div id="kpiOpen" class="value">0</div></div>
+        <div class="item"><div class="title">Visits</div><div id="kpiVisits" class="value">0</div></div>
+        <div class="item"><div class="title">Quotations</div><div id="kpiQuotes" class="value">0</div></div>
+        <div class="item"><div class="title">Bills</div><div id="kpiBills" class="value">0</div></div>
+      </div>
+      <div class="hr"></div>
+      <div class="grid-auto">
+        <div class="card">
+          <div class="headerline"><h3 style="margin:0">Recent leads</h3></div>
+          <table class="table" id="recentLeadsTable">
+            <thead><tr><th>Lead ID</th><th>Company</th><th>Lead</th><th>Status</th><th>Owner</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="headerline"><h3 style="margin:0">Activity</h3></div>
+          <div id="recentActivity" class="muted">No activity yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEADS -->
+    <section id="view-leads" class="card hidden">
+      <div class="headerline">
+        <h2>Leads</h2><span class="sub">Add, track, and progress leads</span>
+      </div>
+
+      <div class="card">
+        <div class="headerline"><h3 style="margin:0">New lead</h3></div>
+        <div class="grid-3">
+          <div><label>Lead name</label><input id="leadName" class="input" /></div>
+          <div><label>Company</label><input id="leadCompany" class="input" /></div>
+          <div><label>Mobile</label><input id="leadMobile" class="input" /></div>
+          <div><label>Alt mobile</label><input id="leadAltMobile" class="input" /></div>
+          <div><label>Sales person</label>
+            <select id="leadSalesPerson" class="input"></select>
+          </div>
+          <div><label>Source</label>
+            <select id="leadSource" class="input">
+              <option>Inbound</option><option>Outbound</option><option>Referral</option>
+              <option>Web</option><option>Event</option><option>Partner</option>
+            </select>
+          </div>
+          <div class="grid-2" style="grid-column:1/-1;gap:12px">
+            <div><label>Product interest</label>
+              <select id="leadProduct" class="input"></select>
+            </div>
+            <div><label>Customer ask</label><input id="leadAsk" class="input" placeholder="e.g., 10kW rooftop solar" /></div>
+          </div>
+          <div style="grid-column:1/-1"><label>Address</label><textarea id="leadAddress" class="input"></textarea></div>
+          <div style="grid-column:1/-1"><label>Remarks</label><textarea id="leadRemarks" class="input" placeholder="Initial remarks"></textarea></div>
+          <div><label>Status</label>
+            <select id="leadStatus" class="input">
+              <option>Open</option><option>In progress</option><option>Quoted</option><option>Won</option><option>Lost</option>
+            </select>
+          </div>
+          <div><label>Employee ID (creator)</label>
+            <input id="leadOwner" class="input" disabled />
+          </div>
+        </div>
+        <div class="sticky-actions row">
+          <button class="btn primary" onclick="createLead()">Create lead</button>
+          <span class="help">Dates auto-generated. Status & remarks editable by all employees.</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div class="searchbar grow">
+            <input id="leadSearch" class="input" placeholder="Search lead, company, mobile, status..." oninput="currentPage=1;renderLeads()" />
+            <select id="leadStatusFilter" class="input" style="max-width:220px" onchange="currentPage=1;renderLeads()">
+              <option value="">All statuses</option>
+              <option>Open</option><option>In progress</option><option>Quoted</option><option>Won</option><option>Lost</option>
+            </select>
+          </div>
+          <div class="row">
+            <span class="chip"><span class="muted">Sort:</span>
+              <select id="leadSort" class="input" style="width:auto" onchange="currentPage=1;renderLeads()">
+                <option value="mod">Last modified</option>
+                <option value="gen">Date created</option>
+                <option value="name">Lead name</option>
+              </select>
+            </span>
+          </div>
+        </div>
+        <div class="row" style="justify-content:space-between; margin:8px 0;">
+          <div class="grow"></div>
+          <div class="row">
+            <button class="btn" onclick="prevPage()">Prev</button>
+            <span id="pageInfo" style="padding:0 12px;display:inline-flex;align-items:center"></span>
+            <button class="btn" onclick="nextPage()">Next</button>
+          </div>
+        </div>
+        <table class="table" id="leadsTable">
+  <thead>
+    <tr>
+      <th>Lead ID</th><th>Company</th><th>Name</th><th>Mobile</th>
+      <th>Status</th><th>Owner</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+      </div>
+
+      <!-- Lead drawer -->
+      <div id="leadDrawer" class="card hidden">
+        <div class="headerline">
+          <h3 id="leadDrawerTitle" style="margin:0"></h3>
+          <span class="sub" id="leadDrawerSub"></span>
+        </div>
+        <div class="grid-3">
+          <div><label>Status</label>
+            <select id="drawerStatus" class="input"></select>
+          </div>
+          <div style="grid-column:1/-1"><label>Remarks</label>
+            <textarea id="drawerRemarks" class="input"></textarea>
+          </div>
+        </div>
+        <div class="row sticky-actions">
+          <button class="btn primary" onclick="saveLeadBasics()">Save</button>
+          <button class="btn ghost" onclick="closeLeadDrawer()">Close</button>
+          <span class="help">All employees can edit status & remarks. Admins see full change log.</span>
+        </div>
+
+        <div class="hr"></div>
+        <div class="row">
+          <span class="pill">Lead sub-pages</span>
+          <button class="btn" onclick="openLeadSub('visit')">Visit</button>
+          <button class="btn" onclick="openLeadSub('quote')">Quotation</button>
+          <!-- <button class="btn" onclick="openLeadSub('bill')">Final bill</button> -->
+    .   </div>
+
+        <!-- VISITS -->
+        <div id="visitPanel" class="card hidden">
+          <div class="headerline"><h3 style="margin:0">Visit section</h3></div>
+          <div class="grid-3">
+            <div><label>Visit number</label><input id="visitNo" class="input" /></div>
+            <div><label>Date of visit</label><input id="visitDate" type="date" class="input" /></div>
+            <div><label>Sales person</label><input id="visitSales" class="input" /></div>
+          </div>
+          <div class="hr"></div>
+          <div class="grid-auto">
+            <div>
+              <label>Product</label>
+              <select id="visitProduct" class="input"></select>
+            </div>
+            <div>
+              <label>Quantity</label>
+              <input id="visitQty" type="number" min="1" class="input" />
+            </div>
+            <div>
+              <label>Status</label>
+              <select id="visitStatus" class="input">
+                <option>Scheduled</option><option>Visited</option><option>Follow-up</option><option>Closed</option>
+              </select>
+            </div>
+            <div style="grid-column:1/-1">
+              <label>Remark</label>
+              <textarea id="visitRemark" class="input"></textarea>
+            </div>
+          </div>
+          <div class="sticky-actions row">
+            <button class="btn primary" onclick="addVisit()">Add visit</button>
+          </div>
+          <table class="table" id="visitTable">
+            <thead><tr><th>#</th><th>Date</th><th>Product</th><th>Qty</th><th>Sales</th><th>Status</th><th>Remark</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- QUOTATION -->
+        <div id="quotePanel" class="card hidden">
+          <div class="headerline"><h3 style="margin:0">Quotation</h3></div>
+          <div class="row">
+            <button class="btn" onclick="addQuoteRow()">Add product row</button>
+            <button class="btn warn" onclick="addMiscRow()">Add miscellaneous row</button>
+            <button class="btn good" onclick="generateQuotation()">Generate PDF</button>
+          </div>
+          <div class="hr"></div>
+          <div class="grid-3">
+            <div><label>Quotation ID</label><input id="quoteId" class="input" /></div>
+            <div><label>Valid till (date)</label><input id="quoteValid" type="date" class="input" /></div>
+            <div><label>Tax % (per row default)</label><input id="quoteTaxDefault" type="number" class="input" value="18" /></div>
+          </div>
+          <div class="hr"></div>
+          <table class="table" id="quoteRows">
+            <thead>
+              <tr>
+                <th>#</th><th>Product ID</th><th>Product name</th><th>Specification</th>
+                <th>Qty</th><th>Rate</th><th>Tax %</th><th>Discount %</th><th>Line total</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="row" style="justify-content:flex-end">
+            <span class="chip">Final quotation amount: <strong id="quoteTotal">0</strong></span>
+          </div>
+        </div>
+
+        <!-- BILLING -->
+        <div id="billPanel" class="card hidden">
+          <div class="headerline"><h3 style="margin:0">Final bill</h3></div>
+          <div class="grid-3">
+            <div><label>Bill date</label><input id="billDate" type="date" class="input" /></div>
+            <div><label>Employee ID (creator)</label><input id="billOwner" class="input" disabled /></div>
+            <div><label>Sales person</label><input id="billSales" class="input" /></div>
+            <div><label>Lead name</label><input id="billLeadName" class="input" disabled /></div>
+            <div><label>Mobile</label><input id="billMobile" class="input" disabled /></div>
+            <div><label>Quotation ref</label><input id="billQuoteRef" class="input" /></div>
+            <div><label>Final bill amount</label><input id="billAmount" type="number" class="input" /></div>
+            <div><label>Payment status</label>
+              <select id="billPayStatus" class="input"><option>Unpaid</option><option>Partial</option><option>Paid</option></select>
+            </div>
+            <div><label>Advance received</label><input id="billAdvance" type="number" class="input" value="0" /></div>
+            <div><label>Pending</label><input id="billPending" type="number" class="input" value="0" disabled /></div>
+            <div><label>Delivery status</label>
+              <select id="billDelivery" class="input"><option>Pending</option><option>Shipped</option><option>Delivered</option></select>
+            </div>
+          </div>
+          <div class="sticky-actions row">
+            <button class="btn primary" onclick="saveFinalBill()">Save bill</button>
+          </div>
+          <table class="table" id="billTable">
+            <thead><tr><th>Date</th><th>Owner</th><th>Sales</th><th>Quote ref</th><th>Amount</th><th>Advance</th><th>Pending</th><th>Pay status</th><th>Delivery</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <!-- ADMIN LOG -->
+        <div id="logPanel" class="card hidden">
+          <div class="headerline"><h3 style="margin:0">Change log</h3><span class="sub">Admins only</span></div>
+          <table class="table" id="logTable">
+            <thead><tr><th>Time</th><th>Employee</th><th>Field</th><th>Old</th><th>New</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section id="view-products" class="card hidden">
+      <div class="headerline">
+        <h2>Products</h2><span class="sub">Catalog (admins can add/edit)</span>
+      </div>
+      <div id="adminProductPanel" class="card hidden">
+        <div class="row">
+          <h3 style="margin:0">Add product</h3>
+          <span class="pill">Admins only</span>
+        </div>
+        <div class="grid-3">
+          <div><label>Product ID</label><input id="prodId" class="input" /></div>
+          <div><label>Product name</label><input id="prodName" class="input" /></div>
+          <div><label>Price</label><input id="prodPrice" type="number" class="input" /></div>
+          <div style="grid-column:1/-1"><label>Specifications</label><textarea id="prodSpec" class="input"></textarea></div>
+          <div><label>Min discount %</label><input id="prodMin" type="number" class="input" value="0" /></div>
+          <div><label>Max discount %</label><input id="prodMax" type="number" class="input" value="20" /></div>
+        </div>
+        <div class="sticky-actions row">
+          <button class="btn primary" onclick="addProduct()">Add to catalog</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div class="searchbar grow">
+            <input id="prodSearch" class="input" placeholder="Search products..." oninput="renderProducts()" />
+          </div>
+          <div class="row">
+            <span class="chip">Total: <strong id="prodCount">0</strong></span>
+          </div>
+        </div>
+        <table class="table" id="productsTable">
+          <thead><tr><th>Product ID</th><th>Name</th><th>Price</th><th>Min%</th><th>Max%</th><th>Spec</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="view-reports" class="card hidden">
+      <div class="headerline">
+        <h2>Reports</h2><span class="sub">Export to Excel (CSV)</span>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3 style="margin:0">Leads</h3>
+          <div class="grid-2">
+            <div><label>Range</label>
+              <select id="leadRange" class="input">
+                <option>Daily</option><option>Weekly</option><option>Monthly</option><option>All</option>
+              </select>
+            </div>
+            <div><label>Lead ID (optional)</label><input id="leadReportId" class="input" placeholder="e.g., L-0001" /></div>
+          </div>
+          <div class="row sticky-actions">
+            <button class="btn primary" onclick="exportLeads()">Export CSV</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin:0">Quotations</h3>
+          <div class="grid-2">
+            <div><label>Range</label>
+              <select id="quoteRange" class="input">
+                <option>Daily</option><option>Weekly</option><option>Monthly</option><option>All</option>
+              </select>
+            </div>
+            <div><label>Lead ID (optional)</label><input id="quoteReportId" class="input" /></div>
+          </div>
+          <div class="row sticky-actions">
+            <button class="btn primary" onclick="exportQuotes()">Export CSV</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin:0">Bills</h3>
+          <div class="grid-2">
+            <div><label>Range</label>
+              <select id="billRange" class="input">
+                <option>Daily</option><option>Weekly</option><option>Monthly</option><option>All</option>
+              </select>
+            </div>
+            <div><label>Lead ID (optional)</label><input id="billReportId" class="input" /></div>
+          </div>
+          <div class="row sticky-actions">
+            <button class="btn primary" onclick="exportBills()">Export CSV</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="card hidden">
+      <div class="headerline">
+        <h2>Settings</h2><span class="sub">Admin management</span>
+      </div>
+      <div class="card">
+        <h3 style="margin:0">Company logo</h3>
+        <div class="row">
+          <img id="logoPreview" src="" alt="Logo" style="width:80px;height:80px;border-radius:12px;object-fit:contain;background:#0a0f1f;border:1px solid var(--border)" />
+          <label class="file btn">
+            <input id="logoFile" type="file" accept="image/*" onchange="uploadLogo()" style="display:none" />
+            <span>Upload / change logo</span>
+          </label>
+        </div>
+        <div class="hr"></div>
+        <div class="grid-3">
+          <div><label>Employee ID</label><input id="empIdSet" class="input" placeholder="E10001" /></div>
+          <div><label>Employee name</label><input id="empNameSet" class="input" /></div>
+          <div><label>Mobile number</label><input id="empMobileSet" class="input" /></div>
+        </div>
+        <div class="sticky-actions row">
+          <button class="btn primary" onclick="setEmployeeMeta()">Add / edit employee meta</button>
+        </div>
+        <div class="help">Admins can manage names and mobiles for all employee IDs. Logo appears in CRM, quotations, and bills.</div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- QUOTATION PRINT VIEW (hidden) -->
+<div id="printFrame" class="hidden">
+  <div class="print-area" id="printArea">
+    <!-- populated dynamically -->
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Firebase SDK -->
+<!-- 
+  SETUP INSTRUCTIONS:
+  1. Go to https://console.firebase.google.com/
+  2. Create a new project or select existing one
+  3. Enable Firestore Database:
+     - Go to Firestore Database in left menu
+     - Click "Create database"
+     - Start in "Production mode" or "Test mode" (for development)
+     - Choose your location
+  4. Get your Firebase config:
+     - Go to Project Settings (gear icon)
+     - Scroll down to "Your apps"
+     - Click the </> icon for Web
+     - Copy the firebaseConfig object values
+  5. Replace the values below with your actual Firebase config
+  6. Set Firestore Security Rules (optional, for production):
+     - Go to Firestore Database > Rules
+     - Use this rule for testing: allow read, write: if true;
+     - For production, add proper authentication rules
+-->
+<script type="module">
+  // Import Firebase functions
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  
+  // ============================================
+  // FIREBASE CONFIGURATION - REPLACE WITH YOUR ACTUAL CONFIG
+  // ============================================
+  const firebaseConfig = {
+  apiKey: "AIzaSyBb0GSpp3j_lu3D7eckvLMJ6fVy2_6RnGc",
+  authDomain: "xtremeindustries-crrm.firebaseapp.com",
+  projectId: "xtremeindustries-crrm",
+  storageBucket: "xtremeindustries-crrm.firebasestorage.app",
+  messagingSenderId: "829088030007",
+  appId: "1:829088030007:web:526a0f74369e3a18a50eb2",
+  measurementId: "G-PS884P5Q0W"
+  };
+  // ============================================
+  
+  try {
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    // Make Firebase functions globally available
+    window.firebaseDB = {
+      db,
+      doc,
+      getDoc,
+      setDoc,
+      onSnapshot,
+      serverTimestamp
+    };
+    
+    console.log('Firebase initialized successfully');
+  } catch(error) {
+    console.error('Firebase initialization failed:', error);
+    console.warn('CRM will continue using localStorage only');
+  }
+</script>
+
+<script>
+let currentPage = 1;
+const pageSize = 10; // show 10 leads per page
+
+async function nextPage(){
+  // Ensure state is loaded
+  if(cachedState === null) await loadStateAsync();
+  const state = loadState();
+  const q = (document.getElementById('leadSearch')?.value || '').toLowerCase();
+  const statusFilter = document.getElementById('leadStatusFilter')?.value || '';
+  const list = state.leads.filter(l=>{
+    const matches = [l.id,l.company,l.name,l.mobile,l.status,l.ownerId,(l.salesPerson||'')].join(' ').toLowerCase().includes(q);
+    return matches && (!statusFilter || l.status===statusFilter);
+  });
+  const totalPages = Math.ceil(list.length / pageSize) || 1;
+  if(currentPage < totalPages){
+    currentPage++;
+    renderLeads();
+  }
+}
+
+function prevPage(){
+  if(currentPage > 1){
+    currentPage--;
+    renderLeads();
+  }
+}
+
+function getDailyCounts(leads){
+  const today = new Date().toISOString().slice(0,10);
+  return leads.filter(l => (l.dateCreated||'').startsWith(today)).length;
+}
+
+function getWeeklyCounts(leads){
+  const now = new Date();
+  const weekAgo = new Date();
+  weekAgo.setDate(now.getDate() - 6); // last 7 days
+  return leads.filter(l => {
+    const d = new Date(l.dateCreated||now);
+    return d >= weekAgo && d <= now;
+  }).length;
+}
+
+
+/* ---------- DATA LAYER ---------- */
+const EMP_IDS = Array.from({length:10}, (_,i)=>`E${(10001+i).toString()}`);
+const ADMINS = new Set(['E10001','E10002']);
+const IT_USERS = new Set(['E10008','E10009','E10010']);
+const SOL_USERS = new Set(['E10003','E10004','E10005','E10006','E10007']);
+function getVisibleProducts(){
+  const state = loadState();
+  if(currentUser?.isAdmin) return state.products;
+
+  if(IT_USERS.has(currentUser.id)){
+    return state.products.filter(p=>p.id.startsWith('IT'));
+  }
+  if(SOL_USERS.has(currentUser.id)){
+    return state.products.filter(p=>p.id.startsWith('SOL'));
+  }
+  return []; // No category assigned
+}
+const FIRM_INFO = `705,7th Floor,Mega Mall,
+The Mall,Kanpur – 208001 
+GSTIN : 09AOLPD7063B1Z3`;
+const QUOTE_NOTE = `Bank Details:
+Xtreme Industries
+Indian Overseas Bank 
+A/c No - 32333300000031 
+IFSC - IOBN003233`;
+
+const QUOTE_TERMS =`Terms & Conditions: 
+1. Payment: 100% Against Delivery 
+2. Quotation Validity Seven Days   
+3. Delivery Within 3 Days After Confirmation 
+4. Order To Be Placed On Xtreme Industries`;
+
+const QUOTE_AUTH = `
+
+
+
+Authorized Signature`;
+
+/* ---------- FIREBASE DATA LAYER ---------- */
+/**
+ * This CRM now supports Firebase Firestore for cloud storage and real-time sync.
+ * 
+ * Features:
+ * - Real-time synchronization across all devices
+ * - Automatic data backup in the cloud
+ * - Offline support with localStorage fallback
+ * - Automatic migration from localStorage to Firebase
+ * - Connection status indicator
+ * 
+ * How it works:
+ * 1. Data is stored in Firestore at 'crm/state' document
+ * 2. localStorage is used as backup and offline cache
+ * 3. Changes sync automatically across all open browser tabs/devices
+ * 4. If Firebase is unavailable, system falls back to localStorage
+ * 
+ * To enable Firebase:
+ * 1. Create a Firebase project at https://console.firebase.google.com/
+ * 2. Enable Firestore Database
+ * 3. Get your config from Project Settings
+ * 4. Replace the firebaseConfig values in the Firebase SDK section above
+ */
+const FIREBASE_STATE_DOC_PATH = 'crm/state';
+const LOCAL_STORAGE_KEY = 'xtreme_crm_state_v1';
+const FIREBASE_MIGRATION_FLAG = 'xtreme_crm_firebase_migrated';
+
+// Global state cache for faster access
+let cachedState = null;
+let firebaseUnsubscribe = null;
+let isFirebaseReady = false;
+let isConnected = true;
+
+// Connection status indicator
+function updateConnectionStatus(connected) {
+  isConnected = connected;
+  const indicator = document.getElementById('connectionStatus');
+  if(indicator) {
+    indicator.textContent = connected ? '🟢 Online' : '🔴 Offline';
+    indicator.style.color = connected ? '#4cd66d' : '#ff6b6b';
+  }
+}
+
+// Initialize default state
+function getDefaultState() {
+  return {
+    logo: '',
+    employees: Object.fromEntries(EMP_IDS.map(id=>[id,{id,name:'',mobile:''}])),
+    products: [
+      {id:'SOL-10K', name:'10kW Rooftop Solar', spec:'Mono PERC panels, string inverter', price:450000, min:0, max:10},
+      {id:'SOL-5K', name:'5kW Rooftop Solar', spec:'Poly panels, string inverter', price:240000, min:0, max:8},
+      {id:'IT-SRV1', name:'Rack Server R1', spec:'Xeon 8-core, 32GB RAM, 2x1TB SSD', price:185000, min:0, max:12},
+      {id:'IT-NB1', name:'Business Laptop L1', spec:'i7, 16GB, 512GB SSD, Win 11 Pro', price:78000, min:0, max:15}
+    ],
+    leads: [],
+    visits: {},
+    quotes: {},
+    bills: {},
+    logs: {},
+    activity: []
+  };
+}
+
+// Load state from Firebase or localStorage (with fallback)
+// This function can work synchronously (returns cached) or asynchronously
+function loadState() {
+  // Return cached state synchronously if available
+  if(cachedState !== null) {
+    return cachedState;
+  }
+  
+  // If no cache, load from localStorage synchronously as fallback
+  return loadStateFromLocalStorage();
+}
+
+// Async function to load from Firebase (called during initialization)
+async function loadStateAsync() {
+  // Try Firebase first if available
+  if(window.firebaseDB && window.firebaseDB.db) {
+    try {
+      const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
+      const docSnap = await window.firebaseDB.getDoc(stateDoc);
+      
+      if(docSnap.exists()) {
+        const data = docSnap.data();
+        cachedState = data;
+        isFirebaseReady = true;
+        updateConnectionStatus(true);
+        
+        // Set up real-time listener
+        if(!firebaseUnsubscribe) {
+          setupFirebaseListener();
+        }
+        
+        return cachedState;
+      } else {
+        // Document doesn't exist, create it with default state
+        const defaultState = getDefaultState();
+        await window.firebaseDB.setDoc(stateDoc, defaultState);
+        cachedState = defaultState;
+        isFirebaseReady = true;
+        updateConnectionStatus(true);
+        setupFirebaseListener();
+        return cachedState;
+      }
+    } catch(error) {
+      console.error('Firebase load error:', error);
+      updateConnectionStatus(false);
+      
+      // Fallback to localStorage
+      const localState = loadStateFromLocalStorage();
+      cachedState = localState;
+      return localState;
+    }
+  }
+  
+  // Fallback to localStorage if Firebase not available
+  const localState = loadStateFromLocalStorage();
+  cachedState = localState;
+  return localState;
+}
+
+// Load from localStorage (fallback)
+function loadStateFromLocalStorage() {
+  const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if(!raw) {
+    const init = getDefaultState();
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(init));
+    return init;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch(e) {
+    console.error('Failed to parse localStorage data:', e);
+    const init = getDefaultState();
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(init));
+    return init;
+  }
+}
+
+// Save state to Firebase or localStorage (with fallback)
+async function saveState(state) {
+  // Update cache immediately for instant UI updates
+  cachedState = state;
+  
+  // Also save to localStorage as backup
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {
+    console.error('Failed to save to localStorage:', e);
+  }
+  
+  // Save to Firebase if available
+  if(window.firebaseDB && window.firebaseDB.db && isFirebaseReady) {
+    try {
+      const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
+      await window.firebaseDB.setDoc(stateDoc, {
+        ...state,
+        lastModified: window.firebaseDB.serverTimestamp()
+      });
+      updateConnectionStatus(true);
+    } catch(error) {
+      console.error('Firebase save error:', error);
+      updateConnectionStatus(false);
+      // State already saved to localStorage as backup
+    }
+  }
+}
+
+// Set up real-time Firebase listener
+function setupFirebaseListener() {
+  if(!window.firebaseDB || !window.firebaseDB.db || firebaseUnsubscribe) return;
+  
+  try {
+    const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
+    
+    firebaseUnsubscribe = window.firebaseDB.onSnapshot(
+      stateDoc,
+      (docSnap) => {
+        if(docSnap.exists()) {
+          const newData = docSnap.data();
+          // Only update if data actually changed (avoid unnecessary re-renders)
+          if(JSON.stringify(cachedState) !== JSON.stringify(newData)) {
+            cachedState = newData;
+            updateConnectionStatus(true);
+            
+            // Re-render UI if user is logged in
+            if(currentUser) {
+              renderDashboard();
+              renderLeads();
+              renderProducts();
+              
+              // If a lead drawer is open, refresh it
+              if(openLeadId) {
+                renderVisits();
+                renderQuoteRows();
+                renderBills();
+                renderLog();
+              }
+            }
+          }
+        }
+      },
+      (error) => {
+        console.error('Firebase listener error:', error);
+        updateConnectionStatus(false);
+      }
+    );
+  } catch(error) {
+    console.error('Failed to setup Firebase listener:', error);
+    updateConnectionStatus(false);
+  }
+}
+
+// Migrate localStorage data to Firebase (one-time)
+async function migrateToFirebase() {
+  if(localStorage.getItem(FIREBASE_MIGRATION_FLAG) === 'true') {
+    return; // Already migrated
+  }
+  
+  if(!window.firebaseDB || !window.firebaseDB.db) {
+    console.log('Firebase not available, skipping migration');
+    return;
+  }
+  
+  try {
+    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if(!localData) {
+      localStorage.setItem(FIREBASE_MIGRATION_FLAG, 'true');
+      return; // No local data to migrate
+    }
+    
+    const state = JSON.parse(localData);
+    const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
+    const docSnap = await window.firebaseDB.getDoc(stateDoc);
+    
+    // Only migrate if Firebase doesn't have data, or if local data is newer
+    if(!docSnap.exists() || (state.leads && state.leads.length > 0)) {
+      await window.firebaseDB.setDoc(stateDoc, state);
+      console.log('Data migrated to Firebase successfully');
+    }
+    
+    localStorage.setItem(FIREBASE_MIGRATION_FLAG, 'true');
+  } catch(error) {
+    console.error('Migration error:', error);
+  }
+}
+
+// Initialize Firebase connection
+async function initFirebase() {
+  // Wait for Firebase SDK to load
+  let attempts = 0;
+  while(!window.firebaseDB && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  if(window.firebaseDB && window.firebaseDB.db) {
+    try {
+      // Load initial state from Firebase
+      await loadStateAsync();
+      // Migrate localStorage data if needed
+      await migrateToFirebase();
+      console.log('Firebase initialized successfully');
+    } catch(error) {
+      console.error('Firebase initialization error:', error);
+      updateConnectionStatus(false);
+      // Ensure we have cached state from localStorage
+      if(cachedState === null) {
+        cachedState = loadStateFromLocalStorage();
+      }
+    }
+  } else {
+    console.warn('Firebase SDK not loaded, using localStorage only');
+    updateConnectionStatus(false);
+    // Ensure we have cached state from localStorage
+    if(cachedState === null) {
+      cachedState = loadStateFromLocalStorage();
+    }
+  }
+}
+
+// Utility functions
+function nowISO(){return new Date().toISOString()}
+function todayStr(){const d=new Date();return d.toISOString().slice(0,10)}
+function uid(prefix){const n=Math.random().toString(36).slice(2,8).toUpperCase();return `${prefix}-${n}`}
+
+/* ---------- AUTH ---------- */
+let currentUser = null;
+async function handleLogin(){
+  const id = (document.getElementById('loginId').value||'').trim().toUpperCase();
+  const pw = document.getElementById('loginPw').value||'';
+  if(!EMP_IDS.includes(id)){alert('Invalid Employee ID');return}
+  if(pw !== id){alert('Incorrect password');return}
+  currentUser = {id, isAdmin: ADMINS.has(id)};
+  
+  // Ensure state is loaded (try async load if needed)
+  if(cachedState === null) {
+    await loadStateAsync();
+  }
+  const state = loadState();
+  // UI init
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('roleLabel').textContent = currentUser.isAdmin?'Admin':'Employee';
+  document.getElementById('userIdBox').textContent = id;
+  const meta = state.employees[id]||{name:'',mobile:''};
+  document.getElementById('userNameBox').textContent = meta.name||'Not set';
+  document.getElementById('userMobileBox').textContent = meta.mobile||'Not set';
+  document.getElementById('leadOwner').value = id;
+  document.getElementById('billOwner').value = id;
+  // Admin-only nav
+  document.getElementById('navSettings').classList.toggle('hidden', !currentUser.isAdmin);
+  document.getElementById('navProducts').classList.toggle('hidden', false); // visible to all
+  document.getElementById('navReports').classList.toggle('hidden', !currentUser.isAdmin);
+  // Admin-only panels
+  document.getElementById('adminProductPanel').classList.toggle('hidden', !currentUser.isAdmin);
+
+  // Logo
+  const logoData = state.logo||'';
+  document.getElementById('crmLogo').src = logoData||'';
+  document.getElementById('loginLogo').src = logoData||'';
+  document.getElementById('logoPreview').src = logoData||'';
+
+  // Fill sales person dropdown with employees
+  const sp = document.getElementById('leadSalesPerson');
+  sp.innerHTML = '';
+  EMP_IDS.forEach(e=>{
+    const name = state.employees[e]?.name||e;
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = `${name}`;
+    sp.appendChild(opt);
+  });
+
+  // Product dropdowns
+  renderProductDropdowns();
+
+  // Dashboard and lists
+  renderDashboard();
+  renderLeads();
+  renderProducts();
+}
+function logout(){
+  currentUser = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+}
+
+
+
+/* ---------- NAV ---------- */
+function switchView(view){
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add('hidden'));
+  document.getElementById(`view-${view}`).classList.remove('hidden');
+}
+
+
+/* ---------- SETTINGS ---------- */
+function uploadLogo(){
+  if(!currentUser?.isAdmin){alert('Admin only');return}
+  const file = document.getElementById('logoFile').files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    const state = loadState();
+    state.logo = ev.target.result;
+    saveState(state);
+    document.getElementById('crmLogo').src = state.logo;
+    document.getElementById('loginLogo').src = state.logo;
+    document.getElementById('logoPreview').src = state.logo;
+    addActivity(`Logo updated by ${currentUser.id}`);
+  };
+  reader.readAsDataURL(file);
+}
+function setEmployeeMeta(){
+  if(!currentUser?.isAdmin){alert('Admin only');return}
+  const id = (document.getElementById('empIdSet').value||'').trim().toUpperCase();
+  const name = (document.getElementById('empNameSet').value||'').trim();
+  const mobile = (document.getElementById('empMobileSet').value||'').trim();
+  if(!EMP_IDS.includes(id)){alert('Invalid Employee ID');return}
+  const state = loadState();
+  state.employees[id] = {id,name,mobile};
+  saveState(state);
+  if(currentUser.id===id){
+    document.getElementById('userNameBox').textContent = name||'Not set';
+    document.getElementById('userMobileBox').textContent = mobile||'Not set';
+  }
+  // refresh sales dropdown
+  const sp = document.getElementById('leadSalesPerson');
+  sp.innerHTML='';
+  EMP_IDS.forEach(e=>{
+    const nm = state.employees[e]?.name||e;
+    const opt = document.createElement('option');
+    opt.value = nm; opt.textContent = nm;
+    sp.appendChild(opt);
+  });
+  addActivity(`Employee meta set for ${id} by ${currentUser.id}`);
+  alert('Employee updated');
+}
+
+/* ---------- PRODUCTS ---------- */
+async function addProduct(){
+  if(!currentUser?.isAdmin){alert('Admin only');return}
+  const id = (document.getElementById('prodId').value||'').trim().toUpperCase();
+  const name = (document.getElementById('prodName').value||'').trim();
+  const price = parseFloat(document.getElementById('prodPrice').value||'0');
+  const spec = (document.getElementById('prodSpec').value||'').trim();
+  const min = parseFloat(document.getElementById('prodMin').value||'0');
+  const max = parseFloat(document.getElementById('prodMax').value||'0');
+  if(!id || !name){alert('Product ID and name required');return}
+
+  // Ensure state is loaded
+  if(cachedState === null) await loadStateAsync();
+  const state = loadState();
+  const exists = state.products.find(p=>p.id===id);
+  if(exists){
+    Object.assign(exists,{name,price,spec,min,max});
+  }else{
+    state.products.push({id,name,price,spec,min,max});
+  }
+  saveState(state);
+  renderProducts();
+  renderProductDropdowns();
+  addActivity(`Product ${id} saved by ${currentUser.id}`);
+  alert('Product saved');
+}
+function renderProducts(){
+  const q = (document.getElementById('prodSearch').value||'').toLowerCase();
+
+  // use centralized visibility
+  const list = getVisibleProducts().filter(p=>{
+    return [p.id,p.name,p.spec,(p.price||'')].join(' ').toLowerCase().includes(q);
+  });
+
+  const tbody = document.querySelector('#productsTable tbody');
+  tbody.innerHTML='';
+  list.forEach(p=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${p.id}</td>
+      <td>${p.name}</td>
+      <td>${fmtMoney(p.price)}</td>
+      <td>${p.min}%</td>
+      <td>${p.max}%</td>
+      <td>${p.spec}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('prodCount').textContent = list.length;
+}
+
+function renderProductDropdowns(){
+  const state = loadState();
+  const ddIds = ['leadProduct','visitProduct'];
+
+  // role-based filter
+  let visibleProducts = state.products;
+  if(!currentUser?.isAdmin){
+    if(IT_USERS.has(currentUser.id)){
+      visibleProducts = visibleProducts.filter(p=>p.id.startsWith('IT'));
+    } else if(SOL_USERS.has(currentUser.id)){
+      visibleProducts = visibleProducts.filter(p=>p.id.startsWith('SOL'));
+    } else {
+      visibleProducts = []; // no category assigned
+    }
+  }
+
+  ddIds.forEach(id=>{
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    visibleProducts.forEach(p=>{
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.name} (${p.id})`;
+      el.appendChild(opt);
+    });
+  });
+}
+
+
+/* ---------- LEADS ---------- */
+let openLeadId = null;
+function createLead(){
+  const name = (document.getElementById('leadName').value||'').trim();
+  const company = (document.getElementById('leadCompany').value||'').trim();
+  const mobile = (document.getElementById('leadMobile').value||'').trim();
+  const altMobile = (document.getElementById('leadAltMobile').value||'').trim();
+  const address = (document.getElementById('leadAddress').value||'').trim();
+  const source = document.getElementById('leadSource').value;
+  const productInterestId = document.getElementById('leadProduct').value;
+  const ask = (document.getElementById('leadAsk').value||'').trim();
+  const remarks = (document.getElementById('leadRemarks').value||'').trim();
+  const status = document.getElementById('leadStatus').value;
+  const owner = document.getElementById('leadOwner').value;
+
+  if(!name || !company || !mobile){alert('Lead name, company, and mobile are required');return}
+  const state = loadState();
+  const leadId = uid('L');
+  const genDate = nowISO();
+  const modDate = genDate;
+  const productName = (state.products.find(p=>p.id===productInterestId)?.name)||productInterestId;
+
+  const lead = {
+    id: leadId,
+    name, company, mobile, altMobile, address,
+    dateCreated: genDate, dateModified: modDate,
+    ownerId: owner,
+    salesPerson: document.getElementById('leadSalesPerson').value,
+    source, productInterestId, productInterestName: productName,
+    ask, status, remarks
+  };
+  state.leads.push(lead);
+  state.visits[leadId] = [];
+  state.quotes[leadId] = {quoteId:'', validTill:'', rows:[], total:0, created:genDate, modified:genDate};
+  state.bills[leadId] = [];
+  state.logs[leadId] = [];
+  addLog(state, leadId, 'Create lead', '', JSON.stringify({status,remarks}), owner);
+  addActivity(`Lead ${leadId} created by ${owner}`);
+  saveState(state);
+  renderLeads();
+  renderDashboard();
+  alert('Lead created');
+}
+function renderLeads(){
+  const state = loadState();
+  const q = (document.getElementById('leadSearch')?.value||'').toLowerCase();
+  const statusFilter = document.getElementById('leadStatusFilter')?.value || '';
+  const sortBy = document.getElementById('leadSort')?.value || 'mod';
+  let list = state.leads.filter(l=>{
+    const matches = [l.id,l.company,l.name,l.mobile,l.status,l.ownerId,(l.salesPerson||'')].join(' ').toLowerCase().includes(q);
+    return matches && (!statusFilter || l.status===statusFilter);
+  });
+  list.sort((a,b)=>{
+    if(sortBy==='name') return a.name.localeCompare(b.name);
+    if(sortBy==='gen') return (b.dateCreated||'').localeCompare(a.dateCreated||'');
+    return (b.dateModified||'').localeCompare(a.dateModified||'');
+  });
+
+  // Pagination
+  const totalPages = Math.ceil(list.length / pageSize) || 1;
+  if(currentPage > totalPages) currentPage = totalPages || 1;
+  const start = (currentPage-1)*pageSize;
+  const end = start + pageSize;
+  const pageItems = list.slice(start, end);   // ✅ only this slice is rendered
+
+  // Render only the current page in leads table
+  const tbody = document.querySelector('#leadsTable tbody');
+  tbody.innerHTML='';
+  pageItems.forEach(l=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td>${l.id}</td>
+      <td>${l.company}</td>
+      <td>${l.name}</td>
+      <td>${l.mobile}</td>
+      <td>${l.status}</td>
+      <td>${l.ownerId}</td>
+      <td><button class="btn" onclick="openLead('${l.id}')">Open</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Update page info
+  const pageInfoEl = document.getElementById('pageInfo');
+  if(pageInfoEl) {
+    pageInfoEl.textContent = `Page ${currentPage} of ${totalPages} (${list.length} total)`;
+  }
+
+  // Recent table on dashboard
+  const rtbody = document.querySelector('#recentLeadsTable tbody');
+  if(rtbody) {
+    rtbody.innerHTML = '';
+    state.leads.slice(-5).reverse().forEach(l=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${l.id}</td>
+        <td>${l.company}</td>
+        <td>${l.name}</td>
+        <td>${l.status}</td>
+        <td>${l.ownerId}</td>
+      `;
+      rtbody.appendChild(tr);
+    });
+  }
+}
+function openLead(id){
+  switchView('leads');
+  openLeadId = id;
+  const state = loadState();
+  const l = state.leads.find(x=>x.id===id);
+  const title = `${l.company} — ${l.name} (${l.id})`;
+  document.getElementById('leadDrawerTitle').textContent = title;
+  document.getElementById('leadDrawerSub').textContent = `Owner: ${l.ownerId} | Sales: ${l.salesPerson} | Mobile: ${l.mobile}`;
+  document.getElementById('leadDrawer').classList.remove('hidden');
+
+  // status & remarks
+  const ds = document.getElementById('drawerStatus');
+  ds.innerHTML = '';
+  ['Open','In progress','Quoted','Won','Lost'].forEach(s=>{
+    const opt=document.createElement('option');opt.value=s;opt.textContent=s;ds.appendChild(opt);
+  });
+  ds.value = l.status;
+  document.getElementById('drawerRemarks').value = l.remarks||'';
+
+  // Pre-fill subpanels context
+  document.getElementById('visitSales').value = l.salesPerson||'';
+  document.getElementById('visitDate').value = todayStr();
+
+  // Quote defaults
+  document.getElementById('quoteId').value = state.quotes[id]?.quoteId||uid('Q');
+  document.getElementById('quoteValid').value = state.quotes[id]?.validTill||todayStr();
+  document.getElementById('quoteTaxDefault').value = 18;
+  renderQuoteRows();
+
+  // Bill defaults
+  document.getElementById('billDate').value = todayStr();
+  document.getElementById('billSales').value = l.salesPerson||'';
+  document.getElementById('billLeadName').value = l.name||'';
+  document.getElementById('billMobile').value = l.mobile||'';
+  document.getElementById('billQuoteRef').value = (state.quotes[id]?.quoteId)||'';
+  renderBills();
+
+  // Visits
+  renderVisits();
+
+  // Admin log
+  document.getElementById('logPanel').classList.toggle('hidden', !currentUser?.isAdmin);
+  renderLog();
+}
+function closeLeadDrawer(){
+  document.getElementById('leadDrawer').classList.add('hidden');
+  openLeadId = null;
+}
+function saveLeadBasics(){
+  if(!openLeadId) return;
+  const state = loadState();
+  const lead = state.leads.find(l=>l.id===openLeadId);
+  const old = {status:lead.status,remarks:lead.remarks};
+  const newStatus = document.getElementById('drawerStatus').value;
+  const newRemarks = document.getElementById('drawerRemarks').value;
+  lead.status = newStatus;
+  lead.remarks = newRemarks;
+  lead.dateModified = nowISO();
+  addLog(state, openLeadId, 'Edit lead', JSON.stringify(old), JSON.stringify({status:newStatus,remarks:newRemarks}), currentUser.id);
+  addActivity(`Lead ${openLeadId} updated by ${currentUser.id}`);
+  saveState(state);
+  renderLeads();
+  renderDashboard();
+  renderLog();
+  alert('Saved');
+}
+
+/* ---------- VISITS ---------- */
+function addVisit(){
+  if(!openLeadId) return;
+  const state = loadState();
+  const v = {
+    no: (document.getElementById('visitNo').value||'').trim() || `${(state.visits[openLeadId]?.length||0)+1}`,
+    date: document.getElementById('visitDate').value || todayStr(),
+    productId: document.getElementById('visitProduct').value,
+    productName: (state.products.find(p=>p.id===document.getElementById('visitProduct').value)?.name)||document.getElementById('visitProduct').value,
+    qty: parseInt(document.getElementById('visitQty').value||'1'),
+    sales: document.getElementById('visitSales').value,
+    status: document.getElementById('visitStatus').value,
+    remark: document.getElementById('visitRemark').value||''
+  };
+  state.visits[openLeadId].push(v);
+  addLog(state, openLeadId, 'Add visit', '', JSON.stringify(v), currentUser.id);
+  addActivity(`Visit added for ${openLeadId} by ${currentUser.id}`);
+  saveState(state);
+  renderVisits();
+  renderDashboard();
+}
+function renderVisits(){
+  if(!openLeadId) return;
+  const state = loadState();
+  const tbody = document.querySelector('#visitTable tbody');
+  tbody.innerHTML='';
+  (state.visits[openLeadId]||[]).forEach((v,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td>${v.no||i+1}</td><td>${v.date}</td><td>${v.productName} (${v.productId})</td><td>${v.qty}</td><td>${v.sales}</td><td>${v.status}</td><td>${v.remark}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- QUOTES ---------- */
+function addQuoteRow(){
+  if(!openLeadId) return;
+  const state = loadState();
+  const rows = state.quotes[openLeadId].rows||[];
+  rows.push({type:'catalog', productId:'', productName:'', spec:'', qty:1, rate:0, tax:parseFloat(document.getElementById('quoteTaxDefault').value||'18'), discount:0});
+  state.quotes[openLeadId].rows = rows;
+  saveState(state);
+  renderQuoteRows();
+}
+function addMiscRow(){
+  if(!openLeadId) return;
+  const state = loadState();
+  const rows = state.quotes[openLeadId].rows||[];
+  rows.push({type:'misc', productId:'MISC', productName:'Misc item', spec:'Custom', qty:1, rate:0, tax:parseFloat(document.getElementById('quoteTaxDefault').value||'18'), discount:0});
+  state.quotes[openLeadId].rows = rows;
+  saveState(state);
+  renderQuoteRows();
+}
+function renderQuoteRows(){
+  if(!openLeadId) return;
+  const state = loadState();
+  const q = state.quotes[openLeadId]||{rows:[]};
+  const tbody = document.querySelector('#quoteRows tbody');
+  tbody.innerHTML='';
+  q.rows.forEach((r,idx)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${r.type==='catalog'
+          ? `<input class="input" value="${r.productId||''}" oninput="onQuotePid(${idx},this.value)" placeholder="e.g., SOL-10K" />`
+          : `<span class="muted">MISC</span>`}</td>
+      <td>${r.type==='catalog'
+          ? `<select class="input" onchange="onQuoteSelect(${idx},this.value)">${productOptions(r.productId)}</select>`
+          : `<input class="input" value="${r.productName||'Misc item'}" oninput="onQuoteName(${idx},this.value)" />`}</td>
+      <td><textarea class="input" oninput="onQuoteSpec(${idx},this.value)">${r.spec||''}</textarea></td>
+      <td><input type="number" min="1" class="input" value="${r.qty||1}" oninput="onQuoteQty(${idx},this.value)" /></td>
+      <td><input type="number" class="input" value="${r.rate||0}" oninput="onQuoteRate(${idx},this.value)" /></td>
+      <td><input type="number" class="input" value="${r.tax||0}" oninput="onQuoteTax(${idx},this.value)" /></td>
+      <td><input type="number" class="input" value="${r.discount||0}" oninput="onQuoteDiscount(${idx},this.value)" /></td>
+      <td class="no-wrap">${fmtMoney(calcLine(r))}</td>
+      <td><button class="btn danger" onclick="removeQuoteRow(${idx})">Remove</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const total = q.rows.reduce((sum,r)=>sum+calcLine(r),0);
+  q.total = total;
+  state.quotes[openLeadId] = q;
+  saveState(state);
+  document.getElementById('quoteTotal').textContent = fmtMoney(total);
+}
+function productOptions(selectedId){
+  const state = loadState();
+
+  // role-based filter
+  let visibleProducts = state.products;
+  if(!currentUser?.isAdmin){
+    if(IT_USERS.has(currentUser.id)){
+      visibleProducts = visibleProducts.filter(p=>p.id.startsWith('IT'));
+    } else if(SOL_USERS.has(currentUser.id)){
+      visibleProducts = visibleProducts.filter(p=>p.id.startsWith('SOL'));
+    } else {
+      visibleProducts = [];
+    }
+  }
+
+  return visibleProducts
+    .map(p=>`<option value="${p.id}" ${p.id===selectedId?'selected':''}>${p.name} (${p.id})</option>`)
+    .join('');
+}
+
+function onQuoteSelect(idx,pid){
+  const state = loadState();
+  const q = state.quotes[openLeadId];
+
+  // role-based check
+  if(!currentUser?.isAdmin){
+    if(IT_USERS.has(currentUser.id) && !pid.startsWith('IT')){
+      alert('You are only allowed to add IT products');
+      return;
+    }
+    if(SOL_USERS.has(currentUser.id) && !pid.startsWith('SOL')){
+      alert('You are only allowed to add SOL products');
+      return;
+    }
+  }
+
+  const r = q.rows[idx];
+  const p = state.products.find(x=>x.id===pid);
+  if(p){
+    r.productId = p.id;
+    r.productName = p.name;
+    r.spec = p.spec;
+    r.rate = p.price;
+    if(r.discount<p.min) r.discount=p.min;
+    if(r.discount>p.max) r.discount=p.max;
+  }
+  q.modified = nowISO();
+  saveState(state);
+  renderQuoteRows();
+}
+
+function onQuotePid(idx,val){
+  const state = loadState();
+  const q = state.quotes[openLeadId];
+  const r = q.rows[idx];
+  const pid = (val||'').toUpperCase();
+
+  // role-based check
+  if(!currentUser?.isAdmin){
+    if(IT_USERS.has(currentUser.id) && !pid.startsWith('IT')){
+      alert('You are only allowed to add IT products');
+      return;
+    }
+    if(SOL_USERS.has(currentUser.id) && !pid.startsWith('SOL')){
+      alert('You are only allowed to add SOL products');
+      return;
+    }
+  }
+
+  r.productId = pid;
+  const p = state.products.find(x=>x.id===r.productId);
+  if(p){
+    r.productName = p.name; r.spec=p.spec; r.rate=p.price;
+    if(r.discount<p.min) r.discount=p.min;
+    if(r.discount>p.max) r.discount=p.max;
+  }
+  q.modified = nowISO(); saveState(state);
+  renderQuoteRows();
+}
+
+function onQuoteName(idx,val){const s=loadState();const r=s.quotes[openLeadId].rows[idx];r.productName=val;s.quotes[openLeadId].modified=nowISO();saveState(s);renderQuoteRows()}
+function onQuoteSpec(idx,val){const s=loadState();const r=s.quotes[openLeadId].rows[idx];r.spec=val;s.quotes[openLeadId].modified=nowISO();saveState(s)}
+function onQuoteQty(idx,val){const s=loadState();const r=s.quotes[openLeadId].rows[idx];r.qty=parseInt(val||'1');s.quotes[openLeadId].modified=nowISO();saveState(s);renderQuoteRows()}
+function onQuoteRate(idx,val){const s=loadState();const r=s.quotes[openLeadId].rows[idx];r.rate=parseFloat(val||'0');s.quotes[openLeadId].modified=nowISO();saveState(s);renderQuoteRows()}
+function onQuoteTax(idx,val){const s=loadState();const r=s.quotes[openLeadId].rows[idx];r.tax=parseFloat(val||'0');s.quotes[openLeadId].modified=nowISO();saveState(s);renderQuoteRows()}
+function onQuoteDiscount(idx,val){
+  const s=loadState();const r=s.quotes[openLeadId].rows[idx];
+  let d=parseFloat(val||'0');
+  const p = s.products.find(x=>x.id===r.productId);
+  if(p){ if(d<p.min) d=p.min; if(d>p.max) d=p.max; }
+  r.discount=d; s.quotes[openLeadId].modified=nowISO(); saveState(s); renderQuoteRows();
+}
+function removeQuoteRow(idx){
+  const s=loadState(); const q=s.quotes[openLeadId]; q.rows.splice(idx,1); q.modified=nowISO(); saveState(s); renderQuoteRows();
+}
+function calcLine(r){
+  const base = (r.qty||1) * (r.rate||0);
+  const disc = base * (r.discount||0)/100;
+  const sub = base - disc;
+  const taxAmt = sub * (r.tax||0)/100;
+  return sub + taxAmt;
+}
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10); // YYYY-MM-DD
+}
+function generateQuotation(){
+  if(!openLeadId) return;
+  const s=loadState();
+  const l = s.leads.find(x=>x.id===openLeadId);
+  const q = s.quotes[openLeadId];
+  if(!q.quoteId){q.quoteId = uid('Q')}
+  q.validTill = document.getElementById('quoteValid').value||todayStr();
+  q.modified = nowISO();
+  saveState(s);
+
+  // Build printable
+  const logo = s.logo||'';
+  const empMeta = s.employees[l.ownerId]||{name:l.ownerId,mobile:''};
+  const total = q.rows.reduce((sum,r)=>sum+calcLine(r),0);
+  const rowsHtml = q.rows.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.productId}</td>
+      <td>${r.productName}</td>
+      <td>${r.spec}</td>
+      <td class="t-right">${r.qty}</td>
+      <td class="t-right">${fmtMoney(r.rate)}</td>
+      <td class="t-right">${r.discount}%</td>
+      <td class="t-right">${r.tax}%</td>
+      <td class="t-right">${fmtMoney(calcLine(r))}</td>
+    </tr>
+  `).join('');
+
+  const area = document.getElementById('printArea');
+  area.innerHTML = `
+  <div class="quotation">
+    <img class="q-logoo" src="${logo}"}
+    <div class="q-header">
+      <div>
+        ${logo?`<img class="q-logo" src="${logo}" alt="Logo" style="width:240px;" />`:''}
+        <div style="white-space:pre-line;font-size:14px;text-align:left"> <br><br> To,
+        <strong>${l.name}</strong>
+        <strong>${l.company}</strong>
+        <div style="font-size:12px;text-align:left">
+        Estimate date: ${fmtDate(nowISO())}
+        Expiry date: ${fmtDate(addDays(nowISO(), 7))}
+        Sales person: ${l.salesPerson||''}
+      	</div> </div>
+      </div>
+      <div>
+      	<div style="font-size:22px;text-align:right"> <strong> ESTIMATE </strong> <br>
+      	  Quotation ID: <strong>${q.quoteId}</strong><br><br></div>
+      	  <div class="q-title" style="font-size:22px;text-align:right">xtreme industries</div>
+     	<div style="white-space:pre-line;text-align:right;"font-size:18px">${FIRM_INFO}</div>
+      </div>
+ </div>
+    <table class="q-table">
+      <thead><tr>
+        <th>#</th><th>Product ID</th><th>Product name</th><th>Specification</th>
+        <th class="t-right">Qty</th><th class="t-right">Rate</th><th class="t-right">Disc%</th><th class="t-right">Tax%</th><th class="t-right">Total</th>
+      </tr></thead>
+      <tbody>${rowsHtml}</tbody>
+      <tfoot>
+        <tr><td colspan="8" class="t-right"><strong>Final quotation amount</strong></td><td class="t-right"><strong>${fmtMoney(total)}</strong></td></tr>
+      </tfoot>
+    </table>
+<div class="flex-cont">
+  <div class="q-notes" style="white-space:pre-line">${QUOTE_NOTE}</div>
+    <div class="q-terms">
+    ${QUOTE_TERMS}
+</div>
+  </div>
+  <div class="flex-cont1">
+  <div class="q-quotedby"  style="white-space:pre-line">
+    <div>Thanking You & Looking Forward to Your Valuable Order with Us.
+
+Your Sincerely, 
+Xtreme Industries
+</div>
+    <div>Quoted By: <strong>${l.ownerId}</strong>
+    ${empMeta.name||''} ${empMeta.mobile||''}</div>
+  </div>
+    <div class="q-auth" style="white-space:pre-line"><strong>${QUOTE_AUTH}</strong></div>
+    </div>
+</div>
+`;
+
+  // Print to PDF (use browser's Print -> Save as PDF)
+  const printWin = window.open('', '_blank');
+  printWin.document.write(`
+  <html><head><title>Quotation ${q.quoteId}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:18px}
+    
+    
+    .q-logoo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 600px;        /* adjust size */
+  height: auto;
+  opacity: 0.1;        /* transparency */
+  transform: translate(-50%, -50%);
+  z-index: 0;          /* behind text */
+}
+.quotation {
+display: flex;justify-content: space-between;white-space: pre-line;text-align:left;border-bottom: 3px solid #FFD700;   /* yellow */
+  box-shadow: 0 3px 0 #ccc;          
+  padding-bottom: 4px;
+  margin-bottom: 12px;border-top: 8px solid #FFD700;   /* yellow */        
+  padding-top: 4px;
+  margin-top: 12px;font-size:10px}
+  position: relative;
+  z-index: 1;
+}
+
+    .q-header{display:flex;justify-content:space-between;align-items:start;
+              border-bottom: 3px solid #FFD700;   /* yellow */
+  box-shadow: 0 3px 0 #ccc;          
+  padding-bottom: 14px;
+  margin-bottom: 12px;}
+    .q-logo{height:48px}
+    .q-title{text-transform:capitalize;font-weight:800;font-size:22px}
+    .q-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px;font-size:12px}
+    .q-table{width:100%;border-collapse:collapse;margin-top:5px}
+    .q-table th,.q-table td{border:1px solid #333;padding:2px;text-align:left}
+    .t-right{text-align:right}
+    .q-quotedby{font-size:10px;white-space: pre-line;text-align:left;}   
+    .q-auth{font-size:10px;white-space: pre-line;text-align:left;font-weight:500;}
+    .q-terms{font-size:11px;text-align:left}      
+    .q-notes{margin-top:10px;font-size:9px,text-align:left;white-space: normal}
+    .flex-cont{display: flex;justify-content: space-between;white-space: pre-line;text-align:left;border-bottom: 3px solid #FFD700;   /* yellow */
+  box-shadow: 0 3px 0 #ccc;          
+  padding-bottom: 4px;
+  margin-bottom: 12px;border-top: 8px solid #FFD700;   /* yellow */        
+  padding-top: 4px;
+  margin-top: 12px;font-size:10px}
+    .flex-cont1{display: flex;justify-content: space-between;white-space: pre-line;text-align:left;  border-bottom: 3px solid #FFD700;   /* yellow */
+  box-shadow: 0 3px 0 #ccc;          
+  padding-bottom: 4px;
+  margin-bottom: 12px;}
+  </style>
+  </head><body>${area.innerHTML}</body></html>
+`);
+  printWin.document.close();
+  printWin.focus();
+  printWin.print();
+
+  // Persist activity
+  addActivity(`Quotation ${q.quoteId} generated for ${openLeadId} by ${currentUser.id}`);
+}
+function fmtMoney(n){return `₹${(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2})}`}
+
+/* ---------- BILLING ---------- */
+function renderBills(){
+  if(!openLeadId) return;
+  const s=loadState();
+  const tbody = document.querySelector('#billTable tbody');
+  tbody.innerHTML='';
+  (s.bills[openLeadId]||[]).forEach(b=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td>${b.date}</td>
+      <td>${b.owner}</td>
+      <td>${b.sales}</td>
+      <td>${b.quoteRef}</td>
+      <td>${fmtMoney(b.amount)}</td>
+      <td>${fmtMoney(b.advance)}</td>
+      <td>${fmtMoney(b.pending)}</td>
+      <td>${b.payStatus}</td>
+      <td>${b.delivery}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function saveFinalBill(){
+  if(!openLeadId) return;
+  const s=loadState();
+  const l = s.leads.find(x=>x.id===openLeadId);
+  const amount = parseFloat(document.getElementById('billAmount').value||'0');
+  const adv = parseFloat(document.getElementById('billAdvance').value||'0');
+  const pending = Math.max(amount - adv, 0);
+  document.getElementById('billPending').value = pending;
+
+  const b = {
+    date: document.getElementById('billDate').value || todayStr(),
+    owner: document.getElementById('billOwner').value,
+    sales: document.getElementById('billSales').value,
+    leadName: l.name,
+    mobile: l.mobile,
+    quoteRef: document.getElementById('billQuoteRef').value || (s.quotes[openLeadId]?.quoteId)||'',
+    amount, advance: adv, pending,
+    payStatus: document.getElementById('billPayStatus').value,
+    delivery: document.getElementById('billDelivery').value
+  };
+  s.bills[openLeadId].push(b);
+  addLog(s, openLeadId, 'Add bill', '', JSON.stringify(b), currentUser.id);
+  addActivity(`Bill saved for ${openLeadId} by ${currentUser.id}`);
+  saveState(s);
+  renderBills();
+  renderDashboard();
+  alert('Bill saved');
+}
+
+/* ---------- LOGS ---------- */
+function addLog(state, leadId, field, oldVal, newVal, emp){
+  if(!state.logs[leadId]) state.logs[leadId]=[];
+  state.logs[leadId].push({
+    time: nowISO(), emp, field, old: oldVal, new: newVal
+  });
+}
+function renderLog(){
+  if(!openLeadId) return;
+  const s=loadState();
+  const tbody = document.querySelector('#logTable tbody');
+  tbody.innerHTML='';
+  (s.logs[openLeadId]||[]).slice().reverse().forEach(item=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td>${fmtDate(item.time)}</td>
+      <td>${item.emp}</td>
+      <td>${item.field}</td>
+      <td class="muted" style="white-space:pre">${item.old||''}</td>
+      <td style="white-space:pre">${item.new||''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const s=loadState();
+  const openCount = s.leads.filter(l=>l.status!=='Won' && l.status!=='Lost').length;
+  document.getElementById('kpiOpen').textContent = openCount;
+  const visitCount = Object.values(s.visits).reduce((a,arr)=>a+(arr?.length||0),0);
+  document.getElementById('kpiVisits').textContent = visitCount;
+  const quoteCount = Object.values(s.quotes).reduce((a,q)=>a+(q?.rows?.length?1:0),0);
+  document.getElementById('kpiQuotes').textContent = quoteCount;
+  const billCount = Object.values(s.bills).reduce((a,arr)=>a+(arr?.length||0),0);
+  document.getElementById('kpiBills').textContent = billCount;
+
+  const act = s.activity.slice(-6).reverse();
+  const box = document.getElementById('recentActivity');
+  box.innerHTML = act.length? act.map(x=>`<div>${x}</div>`).join('') : 'No activity yet.';
+   const state = loadState();
+  const leads = state.leads || [];
+
+  // Daily
+  const dailyCount = getDailyCounts(leads);
+  new Chart(document.getElementById('dailyChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Today'],
+      datasets: [{ label: 'New Leads', data: [dailyCount], backgroundColor: '#FFD700' }]
+    }
+  });
+
+  // Weekly
+  const weeklyCount = getWeeklyCounts(leads);
+  new Chart(document.getElementById('weeklyChart'), {
+    type: 'bar',
+    data: {
+      labels: ['This Week'],
+      datasets: [{ label: 'New Leads', data: [weeklyCount], backgroundColor: '#4CAF50' }]
+    }
+  });
+}
+function addActivity(str){
+  const s=loadState();
+  s.activity.push(`[${fmtDate(nowISO())}] ${str}`);
+  saveState(s);
+}
+
+/* ---------- REPORTS ---------- */
+function exportCSV(filename, rows){
+  const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function dateInRange(d, range){
+  const dt = new Date(d);
+  const today = new Date();
+  if(range==='All') return true;
+  if(range==='Daily'){
+    return dt.toDateString()===today.toDateString();
+  }
+  if(range==='Weekly'){
+    const diff = (today - dt) / (1000*60*60*24);
+    return diff <= 7;
+  }
+  if(range==='Monthly'){
+    return dt.getMonth()===today.getMonth() && dt.getFullYear()===today.getFullYear();
+  }
+  return true;
+}
+function exportLeads(){
+  const s=loadState();
+  const range = document.getElementById('leadRange').value;
+  const lid = (document.getElementById('leadReportId').value||'').trim();
+  const filtered = s.leads.filter(l=>{
+    const matchId = lid? l.id===lid : true;
+    return matchId && dateInRange(l.dateCreated, range);
+  });
+  const rows = [
+    ['LeadID','Name','Company','Mobile','AltMobile','Address','Created','Modified','OwnerID','SalesPerson','Source','ProductInterestID','ProductInterestName','Ask','Status','Remarks']
+  ];
+  filtered.forEach(l=>{
+    rows.push([l.id,l.name,l.company,l.mobile,l.altMobile,l.address,l.dateCreated,l.dateModified,l.ownerId,l.salesPerson,l.source,l.productInterestId,l.productInterestName,l.ask,l.status,l.remarks]);
+  });
+  exportCSV(`leads_${range.toLowerCase()}.csv`, rows);
+}
+function exportQuotes(){
+  const s=loadState();
+  const range = document.getElementById('quoteRange').value;
+  const lid = (document.getElementById('quoteReportId').value||'').trim();
+  const rows = [['LeadID','QuoteID','ValidTill','Created','Modified','RowCount','Total']];
+  Object.entries(s.quotes).forEach(([leadId,q])=>{
+    if(!q?.quoteId) return;
+    const lead = s.leads.find(l=>l.id===leadId);
+    const dateRef = lead?.dateCreated || q.created;
+    if(!dateInRange(dateRef, range)) return;
+    if(lid && leadId!==lid) return;
+    rows.push([leadId,q.quoteId,q.validTill,q.created,q.modified,(q.rows||[]).length,q.total]);
+  });
+  exportCSV(`quotes_${range.toLowerCase()}.csv`, rows);
+}
+function exportBills(){
+  const s=loadState();
+  const range = document.getElementById('billRange').value;
+  const lid = (document.getElementById('billReportId').value||'').trim();
+  const rows = [['LeadID','BillDate','Owner','Sales','QuoteRef','Amount','Advance','Pending','PayStatus','Delivery']];
+  Object.entries(s.bills).forEach(([leadId,arr])=>{
+    arr.forEach(b=>{
+      if(lid && leadId!==lid) return;
+      if(!dateInRange(b.date, range)) return;
+      rows.push([leadId,b.date,b.owner,b.sales,b.quoteRef,b.amount,b.advance,b.pending,b.payStatus,b.delivery]);
+    });
+  });
+  exportCSV(`bills_${range.toLowerCase()}.csv`, rows);
+}
+
+/* ---------- UTIL ---------- */
+function fmtDate(iso){
+  try{
+    const d = new Date(iso);
+    const dd = d.toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'2-digit'});
+    const tt = d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    return `${dd} ${tt}`;
+  }catch(e){return iso}
+}
+
+/* ---------- INIT (logo preview for login) ---------- */
+(async function init(){
+  // Initialize Firebase connection
+  await initFirebase();
+  
+  // Load logo for login screen
+  const state = loadState();
+  const logoData = state.logo||'';
+  document.getElementById('loginLogo').src = logoData||'';
+})();
+
+/* ---------- LEAD SUB-PAGES TOGGLE ---------- */
+function openLeadSub(which){
+  // Hide all sub-panels first
+  document.getElementById('visitPanel').classList.add('hidden');
+  document.getElementById('quotePanel').classList.add('hidden');
+  document.getElementById('billPanel').classList.add('hidden');
+
+  // Show the requested one
+  if(which==='visit'){
+    document.getElementById('visitPanel').classList.remove('hidden');
+  }
+  if(which==='quote'){
+    document.getElementById('quotePanel').classList.remove('hidden');
+  }
+  if(which==='bill'){
+    document.getElementById('billPanel').classList.remove('hidden');
+  }
+}
+
+</script>
+</body>
+</html>
