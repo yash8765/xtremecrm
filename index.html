@@ -101,7 +101,7 @@
   .print-area{background:#fff;color:#000;padding:18px}
   .q-header{display:flex;justify-content:space-between;align-items:start}
   .q-logo{height:48px}
-  .q-title{font-weight:800;font-size:18px}
+  .q-title{font-weight:800;font-size:16px}
   .q-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
   .q-table{width:100%;border-collapse:collapse;margin-top:10px}
   .q-table th,.q-table td{border:1px solid #333;padding:8px;text-align:left}
@@ -174,7 +174,6 @@
       <div class="muted">Name: <span id="userNameBox">Not set</span></div>
       <div class="muted">Mobile: <span id="userMobileBox">Not set</span></div>
       <div class="hr"></div>
-      <div id="connectionStatus" style="font-size:11px;margin-top:8px;">🟢 Online</div>
       <div class="help">Employees can view product list. Admin-only controls are hidden for others.</div>
     </div>
   </aside>
@@ -235,21 +234,12 @@
           <div><label>Lead name</label><input id="leadName" class="input" /></div>
           <div><label>Company</label><input id="leadCompany" class="input" /></div>
           <div><label>Mobile</label><input id="leadMobile" class="input" /></div>
-          <div><label>Alt mobile</label><input id="leadAltMobile" class="input" /></div>
+          <div><label>Alternate Contact</label><input id="leadAltMobile" class="input" /></div>
           <div><label>Sales person</label>
             <select id="leadSalesPerson" class="input"></select>
           </div>
-          <div><label>Source</label>
-            <select id="leadSource" class="input">
-              <option>Inbound</option><option>Outbound</option><option>Referral</option>
-              <option>Web</option><option>Event</option><option>Partner</option>
-            </select>
-          </div>
-          <div class="grid-2" style="grid-column:1/-1;gap:12px">
-            <div><label>Product interest</label>
-              <select id="leadProduct" class="input"></select>
-            </div>
-            <div><label>Customer ask</label><input id="leadAsk" class="input" placeholder="e.g., 10kW rooftop solar" /></div>
+          <div><label>Product interest</label>
+            <select id="leadProduct" class="input"></select>
           </div>
           <div style="grid-column:1/-1"><label>Address</label><textarea id="leadAddress" class="input"></textarea></div>
           <div style="grid-column:1/-1"><label>Remarks</label><textarea id="leadRemarks" class="input" placeholder="Initial remarks"></textarea></div>
@@ -566,75 +556,12 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Firebase SDK -->
-<!-- 
-  SETUP INSTRUCTIONS:
-  1. Go to https://console.firebase.google.com/
-  2. Create a new project or select existing one
-  3. Enable Firestore Database:
-     - Go to Firestore Database in left menu
-     - Click "Create database"
-     - Start in "Production mode" or "Test mode" (for development)
-     - Choose your location
-  4. Get your Firebase config:
-     - Go to Project Settings (gear icon)
-     - Scroll down to "Your apps"
-     - Click the </> icon for Web
-     - Copy the firebaseConfig object values
-  5. Replace the values below with your actual Firebase config
-  6. Set Firestore Security Rules (optional, for production):
-     - Go to Firestore Database > Rules
-     - Use this rule for testing: allow read, write: if true;
-     - For production, add proper authentication rules
--->
-<script type="module">
-  // Import Firebase functions
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-  
-  // ============================================
-  // FIREBASE CONFIGURATION - REPLACE WITH YOUR ACTUAL CONFIG
-  // ============================================
-  const firebaseConfig = {
-  apiKey: "AIzaSyBb0GSpp3j_lu3D7eckvLMJ6fVy2_6RnGc",
-  authDomain: "xtremeindustries-crrm.firebaseapp.com",
-  projectId: "xtremeindustries-crrm",
-  storageBucket: "xtremeindustries-crrm.firebasestorage.app",
-  messagingSenderId: "829088030007",
-  appId: "1:829088030007:web:526a0f74369e3a18a50eb2",
-  measurementId: "G-PS884P5Q0W"
-  };
-  // ============================================
-  
-  try {
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    
-    // Make Firebase functions globally available
-    window.firebaseDB = {
-      db,
-      doc,
-      getDoc,
-      setDoc,
-      onSnapshot,
-      serverTimestamp
-    };
-    
-    console.log('Firebase initialized successfully');
-  } catch(error) {
-    console.error('Firebase initialization failed:', error);
-    console.warn('CRM will continue using localStorage only');
-  }
-</script>
 
 <script>
 let currentPage = 1;
 const pageSize = 10; // show 10 leads per page
 
-async function nextPage(){
-  // Ensure state is loaded
-  if(cachedState === null) await loadStateAsync();
+function nextPage(){
   const state = loadState();
   const q = (document.getElementById('leadSearch')?.value || '').toLowerCase();
   const statusFilter = document.getElementById('leadStatusFilter')?.value || '';
@@ -710,306 +637,46 @@ const QUOTE_AUTH = `
 
 Authorized Signature`;
 
-/* ---------- FIREBASE DATA LAYER ---------- */
-/**
- * This CRM now supports Firebase Firestore for cloud storage and real-time sync.
- * 
- * Features:
- * - Real-time synchronization across all devices
- * - Automatic data backup in the cloud
- * - Offline support with localStorage fallback
- * - Automatic migration from localStorage to Firebase
- * - Connection status indicator
- * 
- * How it works:
- * 1. Data is stored in Firestore at 'crm/state' document
- * 2. localStorage is used as backup and offline cache
- * 3. Changes sync automatically across all open browser tabs/devices
- * 4. If Firebase is unavailable, system falls back to localStorage
- * 
- * To enable Firebase:
- * 1. Create a Firebase project at https://console.firebase.google.com/
- * 2. Enable Firestore Database
- * 3. Get your config from Project Settings
- * 4. Replace the firebaseConfig values in the Firebase SDK section above
- */
-const FIREBASE_STATE_DOC_PATH = 'crm/state';
-const LOCAL_STORAGE_KEY = 'xtreme_crm_state_v1';
-const FIREBASE_MIGRATION_FLAG = 'xtreme_crm_firebase_migrated';
-
-// Global state cache for faster access
-let cachedState = null;
-let firebaseUnsubscribe = null;
-let isFirebaseReady = false;
-let isConnected = true;
-
-// Connection status indicator
-function updateConnectionStatus(connected) {
-  isConnected = connected;
-  const indicator = document.getElementById('connectionStatus');
-  if(indicator) {
-    indicator.textContent = connected ? '🟢 Online' : '🔴 Offline';
-    indicator.style.color = connected ? '#4cd66d' : '#ff6b6b';
-  }
-}
-
-// Initialize default state
-function getDefaultState() {
-  return {
-    logo: '',
-    employees: Object.fromEntries(EMP_IDS.map(id=>[id,{id,name:'',mobile:''}])),
-    products: [
-      {id:'SOL-10K', name:'10kW Rooftop Solar', spec:'Mono PERC panels, string inverter', price:450000, min:0, max:10},
-      {id:'SOL-5K', name:'5kW Rooftop Solar', spec:'Poly panels, string inverter', price:240000, min:0, max:8},
-      {id:'IT-SRV1', name:'Rack Server R1', spec:'Xeon 8-core, 32GB RAM, 2x1TB SSD', price:185000, min:0, max:12},
-      {id:'IT-NB1', name:'Business Laptop L1', spec:'i7, 16GB, 512GB SSD, Win 11 Pro', price:78000, min:0, max:15}
-    ],
-    leads: [],
-    visits: {},
-    quotes: {},
-    bills: {},
-    logs: {},
-    activity: []
-  };
-}
-
-// Load state from Firebase or localStorage (with fallback)
-// This function can work synchronously (returns cached) or asynchronously
-function loadState() {
-  // Return cached state synchronously if available
-  if(cachedState !== null) {
-    return cachedState;
-  }
-  
-  // If no cache, load from localStorage synchronously as fallback
-  return loadStateFromLocalStorage();
-}
-
-// Async function to load from Firebase (called during initialization)
-async function loadStateAsync() {
-  // Try Firebase first if available
-  if(window.firebaseDB && window.firebaseDB.db) {
-    try {
-      const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
-      const docSnap = await window.firebaseDB.getDoc(stateDoc);
-      
-      if(docSnap.exists()) {
-        const data = docSnap.data();
-        cachedState = data;
-        isFirebaseReady = true;
-        updateConnectionStatus(true);
-        
-        // Set up real-time listener
-        if(!firebaseUnsubscribe) {
-          setupFirebaseListener();
-        }
-        
-        return cachedState;
-      } else {
-        // Document doesn't exist, create it with default state
-        const defaultState = getDefaultState();
-        await window.firebaseDB.setDoc(stateDoc, defaultState);
-        cachedState = defaultState;
-        isFirebaseReady = true;
-        updateConnectionStatus(true);
-        setupFirebaseListener();
-        return cachedState;
-      }
-    } catch(error) {
-      console.error('Firebase load error:', error);
-      updateConnectionStatus(false);
-      
-      // Fallback to localStorage
-      const localState = loadStateFromLocalStorage();
-      cachedState = localState;
-      return localState;
-    }
-  }
-  
-  // Fallback to localStorage if Firebase not available
-  const localState = loadStateFromLocalStorage();
-  cachedState = localState;
-  return localState;
-}
-
-// Load from localStorage (fallback)
-function loadStateFromLocalStorage() {
-  const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-  if(!raw) {
-    const init = getDefaultState();
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(init));
-    return init;
-  }
-  try {
-    return JSON.parse(raw);
-  } catch(e) {
-    console.error('Failed to parse localStorage data:', e);
-    const init = getDefaultState();
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(init));
-    return init;
-  }
-}
-
-// Save state to Firebase or localStorage (with fallback)
-async function saveState(state) {
-  // Update cache immediately for instant UI updates
-  cachedState = state;
-  
-  // Also save to localStorage as backup
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
-  } catch(e) {
-    console.error('Failed to save to localStorage:', e);
-  }
-  
-  // Save to Firebase if available
-  if(window.firebaseDB && window.firebaseDB.db && isFirebaseReady) {
-    try {
-      const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
-      await window.firebaseDB.setDoc(stateDoc, {
-        ...state,
-        lastModified: window.firebaseDB.serverTimestamp()
-      });
-      updateConnectionStatus(true);
-    } catch(error) {
-      console.error('Firebase save error:', error);
-      updateConnectionStatus(false);
-      // State already saved to localStorage as backup
-    }
-  }
-}
-
-// Set up real-time Firebase listener
-function setupFirebaseListener() {
-  if(!window.firebaseDB || !window.firebaseDB.db || firebaseUnsubscribe) return;
-  
-  try {
-    const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
-    
-    firebaseUnsubscribe = window.firebaseDB.onSnapshot(
-      stateDoc,
-      (docSnap) => {
-        if(docSnap.exists()) {
-          const newData = docSnap.data();
-          // Only update if data actually changed (avoid unnecessary re-renders)
-          if(JSON.stringify(cachedState) !== JSON.stringify(newData)) {
-            cachedState = newData;
-            updateConnectionStatus(true);
-            
-            // Re-render UI if user is logged in
-            if(currentUser) {
-              renderDashboard();
-              renderLeads();
-              renderProducts();
-              
-              // If a lead drawer is open, refresh it
-              if(openLeadId) {
-                renderVisits();
-                renderQuoteRows();
-                renderBills();
-                renderLog();
-              }
-            }
-          }
-        }
-      },
-      (error) => {
-        console.error('Firebase listener error:', error);
-        updateConnectionStatus(false);
-      }
-    );
-  } catch(error) {
-    console.error('Failed to setup Firebase listener:', error);
-    updateConnectionStatus(false);
-  }
-}
-
-// Migrate localStorage data to Firebase (one-time)
-async function migrateToFirebase() {
-  if(localStorage.getItem(FIREBASE_MIGRATION_FLAG) === 'true') {
-    return; // Already migrated
-  }
-  
-  if(!window.firebaseDB || !window.firebaseDB.db) {
-    console.log('Firebase not available, skipping migration');
-    return;
-  }
-  
-  try {
-    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if(!localData) {
-      localStorage.setItem(FIREBASE_MIGRATION_FLAG, 'true');
-      return; // No local data to migrate
-    }
-    
-    const state = JSON.parse(localData);
-    const stateDoc = window.firebaseDB.doc(window.firebaseDB.db, FIREBASE_STATE_DOC_PATH);
-    const docSnap = await window.firebaseDB.getDoc(stateDoc);
-    
-    // Only migrate if Firebase doesn't have data, or if local data is newer
-    if(!docSnap.exists() || (state.leads && state.leads.length > 0)) {
-      await window.firebaseDB.setDoc(stateDoc, state);
-      console.log('Data migrated to Firebase successfully');
-    }
-    
-    localStorage.setItem(FIREBASE_MIGRATION_FLAG, 'true');
-  } catch(error) {
-    console.error('Migration error:', error);
-  }
-}
-
-// Initialize Firebase connection
-async function initFirebase() {
-  // Wait for Firebase SDK to load
-  let attempts = 0;
-  while(!window.firebaseDB && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  
-  if(window.firebaseDB && window.firebaseDB.db) {
-    try {
-      // Load initial state from Firebase
-      await loadStateAsync();
-      // Migrate localStorage data if needed
-      await migrateToFirebase();
-      console.log('Firebase initialized successfully');
-    } catch(error) {
-      console.error('Firebase initialization error:', error);
-      updateConnectionStatus(false);
-      // Ensure we have cached state from localStorage
-      if(cachedState === null) {
-        cachedState = loadStateFromLocalStorage();
-      }
-    }
-  } else {
-    console.warn('Firebase SDK not loaded, using localStorage only');
-    updateConnectionStatus(false);
-    // Ensure we have cached state from localStorage
-    if(cachedState === null) {
-      cachedState = loadStateFromLocalStorage();
-    }
-  }
-}
-
-// Utility functions
+const db = {
+  stateKey: 'xtreme_crm_state_v1'
+};
 function nowISO(){return new Date().toISOString()}
 function todayStr(){const d=new Date();return d.toISOString().slice(0,10)}
 function uid(prefix){const n=Math.random().toString(36).slice(2,8).toUpperCase();return `${prefix}-${n}`}
+function loadState(){
+  const raw = localStorage.getItem(db.stateKey);
+  if(!raw){
+    const init = {
+      logo: '',
+      employees: Object.fromEntries(EMP_IDS.map(id=>[id,{id,name:'',mobile:''}])),
+      products: [
+        {id:'SOL-10K', name:'10kW Rooftop Solar', spec:'Mono PERC panels, string inverter', price:450000, min:0, max:10},
+        {id:'SOL-5K', name:'5kW Rooftop Solar', spec:'Poly panels, string inverter', price:240000, min:0, max:8},
+        {id:'IT-SRV1', name:'Rack Server R1', spec:'Xeon 8-core, 32GB RAM, 2x1TB SSD', price:185000, min:0, max:12},
+        {id:'IT-NB1', name:'Business Laptop L1', spec:'i7, 16GB, 512GB SSD, Win 11 Pro', price:78000, min:0, max:15}
+      ],
+      leads: [],
+      visits: {},      // leadId -> [visits]
+      quotes: {},      // leadId -> {quoteId, validTill, rows:[], total, created, modified}
+      bills: {},       // leadId -> [bills]
+      logs: {},        // leadId -> [log items]
+      activity: []     // recent activity strings
+    };
+    localStorage.setItem(db.stateKey, JSON.stringify(init));
+    return init;
+  }
+  return JSON.parse(raw);
+}
+function saveState(state){localStorage.setItem(db.stateKey, JSON.stringify(state))}
 
 /* ---------- AUTH ---------- */
 let currentUser = null;
-async function handleLogin(){
+function handleLogin(){
   const id = (document.getElementById('loginId').value||'').trim().toUpperCase();
   const pw = document.getElementById('loginPw').value||'';
   if(!EMP_IDS.includes(id)){alert('Invalid Employee ID');return}
   if(pw !== id){alert('Incorrect password');return}
   currentUser = {id, isAdmin: ADMINS.has(id)};
-  
-  // Ensure state is loaded (try async load if needed)
-  if(cachedState === null) {
-    await loadStateAsync();
-  }
   const state = loadState();
   // UI init
   document.getElementById('login').classList.add('hidden');
@@ -1113,7 +780,7 @@ function setEmployeeMeta(){
 }
 
 /* ---------- PRODUCTS ---------- */
-async function addProduct(){
+function addProduct(){
   if(!currentUser?.isAdmin){alert('Admin only');return}
   const id = (document.getElementById('prodId').value||'').trim().toUpperCase();
   const name = (document.getElementById('prodName').value||'').trim();
@@ -1123,9 +790,6 @@ async function addProduct(){
   const max = parseFloat(document.getElementById('prodMax').value||'0');
   if(!id || !name){alert('Product ID and name required');return}
 
-  // Ensure state is loaded
-  if(cachedState === null) await loadStateAsync();
-  const state = loadState();
   const exists = state.products.find(p=>p.id===id);
   if(exists){
     Object.assign(exists,{name,price,spec,min,max});
@@ -1200,9 +864,7 @@ function createLead(){
   const mobile = (document.getElementById('leadMobile').value||'').trim();
   const altMobile = (document.getElementById('leadAltMobile').value||'').trim();
   const address = (document.getElementById('leadAddress').value||'').trim();
-  const source = document.getElementById('leadSource').value;
   const productInterestId = document.getElementById('leadProduct').value;
-  const ask = (document.getElementById('leadAsk').value||'').trim();
   const remarks = (document.getElementById('leadRemarks').value||'').trim();
   const status = document.getElementById('leadStatus').value;
   const owner = document.getElementById('leadOwner').value;
@@ -1220,8 +882,8 @@ function createLead(){
     dateCreated: genDate, dateModified: modDate,
     ownerId: owner,
     salesPerson: document.getElementById('leadSalesPerson').value,
-    source, productInterestId, productInterestName: productName,
-    ask, status, remarks
+    productInterestId, productInterestName: productName,
+    status, remarks
   };
   state.leads.push(lead);
   state.visits[leadId] = [];
@@ -1416,6 +1078,9 @@ function addMiscRow(){
   saveState(state);
   renderQuoteRows();
 }
+function fmtINR(n){
+  return `₹${(Number(n)||0).toLocaleString('en-IN')}`;
+}
 function renderQuoteRows(){
   if(!openLeadId) return;
   const state = loadState();
@@ -1589,7 +1254,7 @@ function generateQuotation(){
     <img class="q-logoo" src="${logo}"}
     <div class="q-header">
       <div>
-        ${logo?`<img class="q-logo" src="${logo}" alt="Logo" style="width:240px;" />`:''}
+        ${logo?`<div style='display:flex;align-items:center;gap:6px'><img class="q-logo" src="${logo}" alt="Logo" style="width:110px;" /><span style='font-size:26px;font-weight:800;color:#000000;text-transform:uppercase'>${getQuoteSubLogoTextForPrint()}</span></div>`:''}
         <div style="white-space:pre-line;font-size:14px;text-align:left"> <br><br> To,
         <strong>${l.name}</strong>
         <strong>${l.company}</strong>
@@ -1602,8 +1267,8 @@ function generateQuotation(){
       <div>
       	<div style="font-size:22px;text-align:right"> <strong> ESTIMATE </strong> <br>
       	  Quotation ID: <strong>${q.quoteId}</strong><br><br></div>
-      	  <div class="q-title" style="font-size:22px;text-align:right">xtreme industries</div>
-     	<div style="white-space:pre-line;text-align:right;"font-size:18px">${FIRM_INFO}</div>
+      	  <div class="q-title" style="font-size:16px;text-align:right">XTREME INDUSTRIES</div>
+     	<div style="white-space:pre-line;text-align:right;"font-size:22px">${FIRM_INFO}</div>
       </div>
  </div>
     <table class="q-table">
@@ -1636,6 +1301,15 @@ Xtreme Industries
     </div>
 </div>
 `;
+  // Ask for mobile number
+const mobile = prompt("Enter customer's WhatsApp number:", l.mobile || '');
+if(mobile){
+  const msg = `Hello! Thank you for your interest in Xtreme Industries.\nYour quotation ${q.quoteId} has been generated.\nTotal amount: ${fmtINR(q.total)}\nPlease check the attached PDF.`;
+    const encodedMsg = encodeURIComponent(msg);
+  const waUrl = `https://wa.me/${mobile}?text=${encodedMsg}`;
+  window.open(waUrl, '_blank');
+}
+
 
   // Print to PDF (use browser's Print -> Save as PDF)
   const printWin = window.open('', '_blank');
@@ -1700,6 +1374,8 @@ display: flex;justify-content: space-between;white-space: pre-line;text-align:le
 
   // Persist activity
   addActivity(`Quotation ${q.quoteId} generated for ${openLeadId} by ${currentUser.id}`);
+  
+
 }
 function fmtMoney(n){return `₹${(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2})}`}
 
@@ -1857,10 +1533,10 @@ function exportLeads(){
     return matchId && dateInRange(l.dateCreated, range);
   });
   const rows = [
-    ['LeadID','Name','Company','Mobile','AltMobile','Address','Created','Modified','OwnerID','SalesPerson','Source','ProductInterestID','ProductInterestName','Ask','Status','Remarks']
+    ['LeadID','Name','Company','Mobile','AltMobile','Address','Created','Modified','OwnerID','SalesPerson','ProductInterestID','ProductInterestName','Status','Remarks']
   ];
   filtered.forEach(l=>{
-    rows.push([l.id,l.name,l.company,l.mobile,l.altMobile,l.address,l.dateCreated,l.dateModified,l.ownerId,l.salesPerson,l.source,l.productInterestId,l.productInterestName,l.ask,l.status,l.remarks]);
+    rows.push([l.id,l.name,l.company,l.mobile,l.altMobile,l.address,l.dateCreated,l.dateModified,l.ownerId,l.salesPerson,l.productInterestId,l.productInterestName,l.status,l.remarks]);
   });
   exportCSV(`leads_${range.toLowerCase()}.csv`, rows);
 }
@@ -1905,11 +1581,7 @@ function fmtDate(iso){
 }
 
 /* ---------- INIT (logo preview for login) ---------- */
-(async function init(){
-  // Initialize Firebase connection
-  await initFirebase();
-  
-  // Load logo for login screen
+(function init(){
   const state = loadState();
   const logoData = state.logo||'';
   document.getElementById('loginLogo').src = logoData||'';
@@ -1932,6 +1604,14 @@ function openLeadSub(which){
   if(which==='bill'){
     document.getElementById('billPanel').classList.remove('hidden');
   }
+}
+
+function getQuoteSubLogoTextForPrint() {
+  if(!currentUser) return '';
+  if(currentUser.isAdmin) return 'XTREME INDUSTRIES';
+  if(['E10003','E10004','E10005','E10006','E10007'].includes(currentUser.id)) return 'XTREME ENERGIES';
+  if(['E10008','E10009','E10010'].includes(currentUser.id)) return 'XTREME IT';
+  return '';
 }
 
 </script>
